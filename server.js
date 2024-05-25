@@ -10,6 +10,8 @@ const expressMongoanitaize = require('express-mongo-sanitize');
 const session = require('express-session');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const swaggerUi = require('swagger-ui-express');
+const swaggerJsdoc = require('swagger-jsdoc');
 
 const app = express();
 
@@ -37,6 +39,27 @@ process.on('unhandledRejection', error => {
 });
 
 MongoDB.mongoConnect();
+
+// Swagger set up
+const swaggerOptions = {
+	swaggerDefinition: {
+		openapi: '3.0.0',
+		info: {
+			title: 'Voosh user authentication',
+			version: '1.0.0',
+			description: 'This API used for the user register and authentication and managing the user details.'
+		},
+		servers: [
+			{
+				url: 'http://localhost:5050/api/v1/user'
+			}
+		]
+	},
+	apis: ['./server.js', './app/routes/*.js']
+};
+
+const swaggerDocs = swaggerJsdoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Configure session middleware
 app.use(
